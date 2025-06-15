@@ -1,0 +1,313 @@
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+# yaml-language-server: $ref=https://spec.openapis.org/oas/3.1/schema/2025-02-13.json
+
+openapi: 3.0.4
+info:
+  title: SIGAA 2.0
+  description: |-
+    API SIGAA
+  termsOfService: http://redes.unb.br/api/sigaa/terms/
+  contact:
+    email: ricardo.puttini@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://unb.br/api/sigaa
+tags:
+  - name: HistoricoAcademico
+    description: Histórico acadêmico dos alunos da UnB
+paths:
+  /HistoricoAcademico/{id}:
+    get:
+      tags:
+        - HistoricoAcademico
+      summary: Consulta um historico academico
+      description: Consulta o historico academico de um aluno pela matricula (id).
+      operationId: readHistoricoAcademico
+      parameters:
+        - name: id
+          in: path
+          description: Matricula do aluno.
+          required: true
+          schema:
+            type: string
+        - name: _count
+          in: query
+          description: Número de registro retornados por página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: _offset
+          in: query
+          description: Índice do primeiro registro da página atual
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoricoAcademico"
+        "404":
+          description: Historico academico não encontrado!
+  /HistoricoAcademico/{id}/disciplina:
+    patch:
+      tags:
+        - HistoricoAcademico
+      summary: Atualiza uma disciplina do histórico acadêmico.
+      description: Atualiza uma disciplina do histórico acadêmico de um aluno pelo código da disciplina (id).
+      operationId: UpdateHistoricoAcademico
+      parameters:
+        - name: id
+          in: path
+          description: Matrícula do aluno.
+          required: true
+          schema:
+            type: string
+        - name: codigo
+          in: query
+          description: Código da disciplina a ser atualizada.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Dados para atualização da disciplina do histórico.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HistoricoAcademico_Disciplina"
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoricoAcademico_Disciplina"
+        "404":
+          description: Histórico acadêmico ou disciplina não encontrado!
+        "400":
+          description: Requisição inválida.
+  /HistoricoAcademico/{id}/ComponentesPendentes:
+    get:
+      tags:
+        - HistoricoAcademico
+      summary: Lista os pré-requisitos pendentes de um histórico acadêmico
+      description: Retorna as disciplinas que são pré-requisitos e ainda não foram cumpridas pelo aluno deste histórico acadêmico.
+      operationId: SearchComponentesPendentes
+      parameters:
+        - name: id
+          in: path
+          description: Matrícula do aluno.
+          required: true
+          schema:
+            type: string
+        - name: disciplina
+          in: query
+          description: Código da disciplina para filtrar os pré-requisitos (id).
+          schema:
+            $ref: "#/components/schemas/HistoricoAcademico_Disciplina"
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoricoAcademico_Disciplina_Short"
+        "404":
+          description: Histórico acadêmico não encontrado!
+components:
+  schemas:
+    Resource:
+      type: object
+      properties:
+        id:
+          type: string
+        resourceType:
+          type: string
+          enum:
+            - Aluno
+            - Curriculo
+            - Curso
+            - Disciplina
+            - HistoricoAcademico
+            - Matricula
+            - Turma
+        lastUpdated:
+          type: string
+          format: dateTime
+
+    SearchSet:
+      type: object
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        count:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        link:
+          type: object
+          properties:
+            self:
+              type: string
+            next:
+              type: string
+            previous:
+              type: string
+
+    HistoricoAcademico_Aluno:
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            matricula:
+              type: string
+            nome:
+              type: string
+            ira:
+              type: number
+            periodoIngresso:
+              $ref: "#/components/schemas/HistoricoAcademico_PeriodoLetivo"
+            curso:
+              $ref: "#/components/schemas/HistoricoAcademico_Curso_Short"
+            curriculo:
+              $ref: "#/components/schemas/HistoricoAcademico_Curriculo_Short"
+
+    HistoricoAcademico_Short:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            matricula:
+              type: string
+            nome:
+              type: string
+
+    HistoricoAcademico_SearchSet:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/SearchSet"
+        - properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/HistoricoAcademico_Short"
+
+    HistoricoAcademico_Disciplina_Short:
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            codigo:
+              type: string
+            nome:
+              type: string
+
+    HistoricoAcademico:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            aluno:
+              $ref: "#/components/schemas/HistoricoAcademico_Aluno"
+            disciplina:
+              $ref: "#/components/schemas/HistoricoAcademico_Disciplina"
+            cargaHorariaIntegralizada:
+              type: integer
+            cargaHorariaPendente:
+              type: integer
+            status:
+              type: string
+            componentesPendentes:
+              $ref: "#/components/schemas/HistoricoAcademico_ComponentesPendentes"
+
+    HistoricoAcademico_ComponentesPendentes:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/HistoricoAcademico_Disciplina_Short"
+        - properties:
+            tipo:
+              $ref: "#/components/schemas/HistoricoAcademico_Disciplina_Tipo"
+            nivel:
+              $ref: "#/components/schemas/HistoricoAcademico_Disciplina_Nivel"
+
+    HistoricoAcademico_Disciplina:
+      type: object
+      properties:
+        mencao:
+          type: string
+          enum:
+            - SR
+            - II
+            - MM
+            - MS
+            - SS
+        frequencia:
+          type: number
+          format: double
+        status:
+          type: string
+        disciplina:
+          $ref: "#/components/schemas/HistoricoAcademico_Disciplina_Short"
+
+    HistoricoAcademico_PeriodoLetivo:
+      type: object
+      properties:
+        ano:
+          type: integer
+        periodo:
+          type: integer
+
+    HistoricoAcademico_Curso_Short:
+      type: object
+      properties:
+        codigo:
+          type: string
+        nome:
+          type: string
+        sede:
+          type: string
+
+    HistoricoAcademico_Curriculo_Short:
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            codigo:
+              type: string
+            status:
+              $ref: "#/components/schemas/HistoricoAcademico_Curriculo_Status"
+            curso:
+              $ref: "#/components/schemas/HistoricoAcademico_Curso_Short"
+            periodoLetivoVigor:
+              $ref: "#/components/schemas/HistoricoAcademico_PeriodoLetivo"
+
+    HistoricoAcademico_Disciplina_Tipo:
+      type: string
+      enum:
+        - Obrigatória
+        - Optativa
+
+    HistoricoAcademico_Disciplina_Nivel:
+      type: integer
+      minimum: 1
+
+    HistoricoAcademico_Curriculo_Status:
+      type: string
+      enum:
+        - Ativo
+        - Inativo
