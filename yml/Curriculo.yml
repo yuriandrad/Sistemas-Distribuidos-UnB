@@ -1,0 +1,379 @@
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+# yaml-language-server: $ref=https://spec.openapis.org/oas/3.1/schema/2025-02-13.json
+
+openapi: 3.0.4
+info:
+  title: SIGAA 2.0
+  description: |-
+    API SIGAA
+  termsOfService: http://redes.unb.br/api/sigaa/terms/
+  contact:
+    email: ricardo.puttini@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://unb.br/api/sigaa
+tags:
+  - name: Curriculo
+    description: Currículo dos cursos da UnB
+paths:
+  /Curriculo:
+    get:
+      tags:
+        - Curriculo
+      summary: Pesquisa curriculo.
+      description: Pesquisa curriculo de um curso.
+      operationId: searchCurriculo
+      parameters:
+        - name: curso
+          in: query
+          description: Código do curso.
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Status do curriculo do curso.
+          required: false
+          schema:
+            type: string
+        - name: _count
+          in: query
+          description: Número de registro retornados por página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: _offset
+          in: query
+          description: Índice do primeiro registro da página atual
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Curriculo_SearchSet"
+  /Curriculo/{id}:
+    get:
+      tags:
+        - Curriculo
+      summary: Consultar curriculo.
+      description: Consulta um curriculo pelo seu código (id).
+      operationId: readCurriculo
+      parameters:
+        - name: id
+          in: path
+          description: Códiigo do curriculo do curso.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Curriculo"
+        "404":
+          description: Disciplina não encontrado!
+  /Curriculo/{id}/disciplina:
+    get:
+      tags:
+        - Curriculo
+      summary: Pesquisar disciplina.
+      description: Pesquisa disciplina de um curriculo da UnB.
+      operationId: searchCurriculoDisciplina
+      parameters:
+        - name: id
+          in: path
+          description: Código do currículo do curso.
+          required: true
+          schema:
+            type: string
+        - name: tipo
+          in: query
+          description: Tipo da disciplina do currículo.
+          required: false
+          schema:
+            type: string
+        - name: nivel
+          in: query
+          description: Nível da disciplina.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Curriculo_Disciplina"
+        "404":
+          description: Disciplina não encontrado!
+
+components:
+  schemas:
+    Resource:
+      type: object
+      properties:
+        id:
+          type: string
+        resourceType:
+          type: string
+          enum:
+            - Aluno
+            - Curriculo
+            - Curso
+            - Disciplina
+            - HistoricoAcademico
+            - Matricula
+            - Turma
+        lastUpdated:
+          type: string
+          format: dateTime
+    example:
+      id: 8117/1
+      resourceType: Curriculo
+      lastUpdated: 2022-08-09T15:30:00.000Z
+
+    SearchSet:
+      type: object
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        count:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        link:
+          type: object
+          properties:
+            self:
+              type: string
+            next:
+              type: string
+            previous:
+              type: string
+      example:
+        total: 1
+        count: 1
+        offset: 0
+        link:
+          self: Curriculo?_count=1&_offset=0
+          next: Curriculo?_count=1&_offset=1
+          previous: Curriculo?_count=1&_offset=0
+
+    Curriculo:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            codigo:
+              type: string
+            status:
+              type: string
+              enum:
+                - Ativo
+                - Inativo
+            dataValidade:
+              type: string
+            curso:
+              codigo:
+                type: string
+              nome:
+                type: string
+              turno:
+                type: string
+              grau:
+                type: string
+              modalidade:
+                type: string
+              sede:
+                type: string
+              unidadeOrganizacional:
+                codigo:
+                  type: string
+                nome:
+                  type: string
+            periodoLetivoVigor:
+              properties:
+                ano:
+                  type: integer
+                periodo:
+                  type: integer
+            cargaHoraria:
+              totalMinima:
+                type: integer
+              obrigatoriaAula:
+                type: integer
+              obrigatoriaOrientacao:
+                type: integer
+              obrigatoriaTotal:
+                type: integer
+              optativaMinima:
+                type: integer
+              maximaEletivos:
+                type: integer
+              maximaPeriodo:
+                type: integer
+              minimaPeriodo:
+                type: integer
+            prazo:
+              minimo:
+                type: integer
+              medio:
+                type: integer
+              maximo:
+                type: integer
+            disciplina:
+              tipo:
+                type: string
+              nivel:
+                type: integer
+      example:
+        id: 8117/1
+        resourceType: Curriculo
+        lastUpdated: 2022-08-09T15:30:00.000Z
+        codigo: 8117/1
+        status: Ativo
+        dataValidade: Indefinido
+        curso:
+          codigo: 8117
+          nome: Administracao
+          turno: Matutino
+          grau: Bacharelado
+          modalidade: Presencial
+          sede: Asa Norte
+          unidadeOrganizacional:
+            codigo: 11.01.01.02.01
+            nome: DEPTO ADMINISTRAÇÃO - BRASÍLIA
+        periodoLetivoVigor:
+          ano: 2020
+          periodo: 1
+        cargaHoraria:
+          totalMinima: 3000
+          obrigatoriaAula: 1680
+          obrigatoriaOrientacao: 0
+          obrigatoriaTotal: 1680
+          optativaMinima: 1320
+          maximaEletivos: 360
+          maximaPeriodo: 420
+          minimaPeriodo: 210
+        prazo:
+          minimo: 8
+          medio: 8
+          maximo: 16
+        disciplina:
+          tipo: Obrigatória
+          nivel: 1
+
+    Curriculo_Short:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            codigo:
+              type: string
+            curso:
+              codigo:
+                type: string
+              nome:
+                type: string
+
+    Curriculo_SearchSet:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/SearchSet"
+        - properties:
+            items:
+              type: array
+              items:
+                allOf:
+                  - $ref: "#/components/schemas/Curriculo_Short"
+      example:
+        total: 5
+        count: 2
+        offset: 2
+        link:
+          self: Curriculo?_count=2&_offset=2
+          next: Curriculo?_count=2&_offset=4
+          previous: Curriculo?_count=2&_offset=0
+        items:
+          - id: 8117/1
+            resourceType: Curriculo
+            lastUpdated: 2019-01-01T00:00:00Z
+            codigo: 8117/1
+            curso:
+              codigo: 8117
+              nome: Administração
+          - id: 8117/-2
+            resourceType: Curriculo
+            lastUpdated: 2019-01-01T00:00:00Z
+            codigo: 8117/-2
+            curso:
+              codigo: 8117
+              nome: Administração
+
+    Curriculo_Disciplina:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Curriculo_Disciplina_Short"
+        - properties:
+            tipo:
+              type: string
+            nivel:
+              type: integer
+              minimum: 1
+            prazo:
+              minimo:
+                type: integer
+              medio:
+                type: integer
+              maximo:
+                type: integer
+      example:
+        id: ADM0023
+        resourceType: Curriculo
+        lastUpdated: 2019-01-01T00:00:00Z
+        codigo: ADM0023
+        nome: Introdução à Administração
+        tipo: Obrigatória
+        nivel: 1
+        prazo:
+          minimo: 8
+          medio: 8
+          maximo: 16
+
+    Curriculo_Disciplina_Short:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            codigo:
+              type: string
+              example: ADM0023
+            nome:
+              type: string
+              example: Introdução à Administração
+      example:
+        id: ADM0023
+        resourceType: Curriculo
+        lastUpdated: 2019-01-01T00:00:00Z
+        codigo: ADM0023
+        nome: Introdução à Administração
