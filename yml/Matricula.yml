@@ -1,0 +1,477 @@
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+# yaml-language-server: $ref=https://spec.openapis.org/oas/3.1/schema/2025-02-13.json
+
+openapi: 3.0.4
+info:
+  title: SIGAA 2.0
+  description: |-
+    API SIGAA
+  termsOfService: http://redes.unb.br/api/sigaa/terms/
+  contact:
+    email: ricardo.puttini@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://unb.br/api/sigaa
+tags:
+  - name: Matricula
+    description: Matrícula dos alunos da UnB
+paths:
+  /Matricula:
+    get:
+      tags:
+        - Matricula
+      summary: Pesquisa a matrícula de um aluno.
+      description: Pesquisa as informações da matrícula de um aluno.
+      operationId: searchMatricula
+      parameters:
+        - name: aluno
+          in: query
+          description: Número da matrícula do aluno.
+          required: false
+          schema:
+            type: string
+        - name: turma
+          in: query
+          description: Turma do aluno.
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Status da matrícula do aluno.
+          required: false
+          schema:
+            $ref: "#/components/schemas/Matricula_Status"
+        - name: _count
+          in: query
+          description: Número de registro retornados por página.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: _offset
+          in: query
+          description: Índice do primeiro registro da página atual.
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Matricula_SearchSet"
+    post:
+      tags:
+        - Matricula
+      summary: Criar matrícula.
+      description: Criar novas matrículas.
+      operationId: createMatricula
+      requestBody:
+        description: Lista de matricula.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Matricula_Create"
+        required: true
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Matricula"
+        "400":
+          description: Invalid input
+        "422":
+          description: Validation exception
+  /Matricula/_history:
+    get:
+      tags:
+        - Matricula
+      summary: Histórico de versões de matrículas
+      description: Lista todas as versões e alterações de todas as matrículas.
+      operationId: historyMatricula
+      parameters:
+        - name: aluno
+          in: query
+          description: Filtra pelo número de matrícula do aluno.
+          required: false
+          schema:
+            type: string
+        - name: turma
+          in: query
+          description: Filtra pelo código da turma.
+          required: false
+          schema:
+            type: string
+        - name: _since
+          in: query
+          description: Mostra versões dos recursos que foram criados desde a data informada.
+          required: false
+          schema:
+            type: string
+            format: dateTime
+        - name: _at
+          in: query
+          description: Mostra as versões dos recursos em alguma data específica.
+          required: false
+          schema:
+            type: string
+            format: dateTime
+        - name: _count
+          in: query
+          description: Número de registros por página.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: _offset
+          in: query
+          description: Posição inicial da página.
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Histórico das matrículas retornado com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Matricula_History"
+        "404":
+          description: Nenhuma versão encontrada!
+  /Matricula/{id}/status:
+    patch:
+      tags:
+        - Matricula
+      summary: Atualiza o status de uma matrícula.
+      description: Atualiza o status de uma matrícula.
+      operationId: updateMatriculaStatus
+      parameters:
+        - name: id
+          in: path
+          description: Matrícula do aluno.
+          required: true
+          schema:
+            type: string
+        - name: codigo
+          in: query
+          description: Código da turma.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Dados para atualização da matrícula do aluno.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Matricula_Status"
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Matricula_Status"
+        "404":
+          description: Histórico acadêmico ou disciplina não encontrado!
+        "400":
+          description: Requisição inválida.
+
+components:
+  schemas:
+    Resource:
+      type: object
+      properties:
+        id:
+          type: string
+        resourceType:
+          type: string
+          enum:
+            - Aluno
+            - Curriculo
+            - Curso
+            - Disciplina
+            - HistoricoAcademico
+            - Matricula
+            - Turma
+        lastUpdated:
+          type: string
+          format: dateTime
+    SearchSet:
+      type: object
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        count:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        link:
+          type: object
+          properties:
+            self:
+              type: string
+            next:
+              type: string
+            previous:
+              type: string
+
+    Matricula_Aluno_Short:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            matricula:
+              type: string
+            nome:
+              type: string
+
+    Matricula_Curso:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            codigo:
+              type: string
+            nome:
+              type: string
+            turno:
+              type: string
+              enum:
+                - Diurno
+                - Noturno
+            grau:
+              type: string
+              enum:
+                - Bacharelado
+                - Especialização
+                - Mestrado Acadêmico
+                - Mestrado Profissional
+                - Doutorado
+            modalidade:
+              type: string
+              enum:
+                - Presencial
+                - À distância
+            sede:
+              type: string
+            unidadeOrganizacional:
+              $ref: "#/components/schemas/Matricula_UnidadeOrganizacional"
+            coordenador:
+              $ref: "#/components/schemas/Matricula_Docente"
+
+    Matricula_Curso_Short:
+      type: object
+      properties:
+        codigo:
+          type: string
+        nome:
+          type: string
+        sede:
+          type: string
+
+    Matricula_Disciplina_Short:
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            codigo:
+              type: string
+            nome:
+              type: string
+
+    Matricula_PeriodoLetivo:
+      type: object
+      properties:
+        ano:
+          type: integer
+        periodo:
+          type: integer
+
+    Matricula_Docente:
+      type: object
+      properties:
+        matricula:
+          type: string
+        nome:
+          type: string
+
+    Matricula_UnidadeOrganizacional:
+      type: object
+      properties:
+        codigo:
+          type: string
+        nome:
+          type: string
+
+    Matricula:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            aluno:
+              $ref: "#/components/schemas/Matricula_Aluno_Short"
+            turma:
+              $ref: "#/components/schemas/Matricula_Turma_Short"
+            status:
+              $ref: "#/components/schemas/Matricula_Status"
+            motivoIndeferimento:
+              $ref: "#/components/schemas/Matricula_MotivoIndeferimento"
+            prioridade:
+              $ref: "#/components/schemas/Matricula_Prioridade"
+
+    Matricula_SearchSet:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/SearchSet"
+        - properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Matricula"
+
+    Matricula_History:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/SearchSet"
+        - properties:
+            items:
+              type: array
+              items:
+                type: object
+                allOf:
+                  - $ref: "#/components/schemas/Resource"
+                  - type: object
+                    properties:
+                      aluno:
+                        $ref: "#/components/schemas/Matricula_Aluno_Short"
+                      turma:
+                        $ref: "#/components/schemas/Matricula_Turma_Short"
+                      status:
+                        $ref: "#/components/schemas/Matricula_Status"
+
+    Matricula_Create:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - required:
+            - aluno
+            - turma
+            - status
+        - properties:
+            aluno:
+              type: object
+              description: Número de matricula do aluno (id).
+              properties:
+                id:
+                  type: string
+              required:
+                - id
+            turma:
+              type: object
+              description: Código da turma do aluno (id).
+              properties:
+                id:
+                  type: string
+              required:
+                - id
+            status:
+              $ref: "#/components/schemas/Matricula_Status"
+
+    Matricula_Status:
+      type: string
+      enum:
+        - PRE
+        - PND
+        - REJ
+        - REA
+        - REC
+        - MAT
+        - TRA
+        - CAN
+        - NEL
+        - CEX
+        - JMD
+        - CON
+        - FUL
+        - CFM
+    Matricula_MotivoIndeferimento:
+      type: string
+    Matricula_Prioridade:
+      type: integer
+
+    Matricula_Turma:
+      type: object
+      properties:
+        resourseType:
+          type: string
+          enum:
+            - Turma
+        codigo:
+          type: string
+        vagasOfertadas:
+          type: integer
+        vagasPreenchidas:
+          type: integer
+        status:
+          type: string
+        horario:
+          $ref: "#/components/schemas/Matricula_Turma_Horario"
+        periodoLetivo:
+          $ref: "#/components/schemas/Matricula_PeriodoLetivo"
+        disciplina:
+          $ref: "#/components/schemas/Matricula_Disciplina_Short"
+
+    Matricula_Turma_Short:
+      type: object
+      properties:
+        codigo:
+          $ref: "#/components/schemas/Matricula_Turma"
+        horario:
+          $ref: "#/components/schemas/Matricula_Turma_Horario"
+        curriculo:
+          $ref: "#/components/schemas/Matricula_Curso_Short"
+
+    Matricula_Turma_Horario:
+      type: object
+      properties:
+        dia:
+          type: string
+          enum:
+            - Segunda-feira
+            - Terca-feira
+            - Quarta-feira
+            - Quinta-feira
+            - Sexta-feira
+        inicio:
+          type: string
+          enum:
+            - Manha
+            - Tarde
+            - Noite
+        fim:
+          type: string
+          enum:
+            - Manha
+            - Tarde
+            - Noite
