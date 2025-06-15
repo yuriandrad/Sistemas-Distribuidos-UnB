@@ -1,0 +1,281 @@
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+# yaml-language-server: $ref=https://spec.openapis.org/oas/3.1/schema/2025-02-13.json
+
+openapi: 3.0.4
+info:
+  title: SIGAA 2.0
+  description: |-
+    API SIGAA
+  termsOfService: http://redes.unb.br/api/sigaa/terms/
+  contact:
+    email: ricardo.puttini@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://unb.br/api/sigaa
+tags:
+  - name: Aluno
+    description: Alunos da UnB
+paths:
+  /Aluno:
+    get:
+      tags:
+        - Aluno
+      summary: Pesquisa alunos
+      description: Pesquisa alunos da UnB
+      operationId: searchAluno
+      parameters:
+        - name: matricula
+          in: query
+          description: Matrícula do aluno.
+          required: false
+          schema:
+            type: string
+        - name: nome
+          in: query
+          description: Nome ou parte do nome do aluno
+          required: false
+          schema:
+            type: string
+        - name: curso
+          in: query
+          description: Código do curso do aluno.
+          required: false
+          schema:
+            type: string
+        - name: periodoIngresso
+          in: query
+          description: Período de ingresso do aluno na UnB.
+          required: false
+          schema:
+            type: string
+        - name: _count
+          in: query
+          description: Número de registro retornados por página.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: _offset
+          in: query
+          description: Índice do primeiro registro da página atual.
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Aluno_SearchSet"
+        "404":
+          description: Aluno não encontrado!
+
+  /Aluno/{id}:
+    get:
+      tags:
+        - Aluno
+      summary: Consultar aluno.
+      description: Consulta o aluno pela sua matrícula (id).
+      operationId: readAluno
+      parameters:
+        - name: id
+          in: path
+          description: Matrícula do aluno (id).
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Aluno"
+        "404":
+          description: Aluno não encontrado!
+
+components:
+  schemas:
+    Resource:
+      type: object
+      properties:
+        id:
+          type: string
+        resourceType:
+          type: string
+          enum:
+            - Aluno
+            - Curriculo
+            - Curso
+            - Disciplina
+            - HistoricoAcademico
+            - Matricula
+            - Turma
+        lastUpdated:
+          type: string
+          format: dateTime
+    example:
+      id: 123456789
+      resourceType: Aluno
+      lastUpdated: 2023-02-13T12:00:00Z
+
+    SearchSet:
+      type: object
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        count:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        link:
+          type: object
+          properties:
+            self:
+              type: string
+            next:
+              type: string
+            previous:
+              type: string
+      example:
+        total: 5
+        count: 2
+        offset: 2
+        link:
+          self: Aluno?_count=2&_offset=2
+          next: Aluno?_count=2&_offset=4
+          previous: Aluno?_count=2&_offset=0
+
+    Aluno_SearchSet:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/SearchSet"
+        - properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Aluno_Short"
+      example:
+        total: 5
+        count: 2
+        offset: 2
+        link:
+          self: Aluno?_count=2&_offset=2
+          next: Aluno?_count=2&_offset=4
+          previous: Aluno?_count=2&_offset=0
+        items:
+          - id: "1800012345"
+            resourceType: Aluno
+            lastUpdated: 2023-02-13T12:00:00Z
+            matricula: "1800012345"
+            nome: Ricardo Staciarini Puttini
+          - id: "1800012346"
+            resourceType: Aluno
+            lastUpdated: 2023-02-13T12:00:00Z
+            matricula: "1800012347"
+            nome: Ricardo Stefano
+
+    Aluno:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            matricula:
+              type: string
+            nome:
+              type: string
+            ira:
+              type: number
+            periodoIngresso:
+              $ref: "#/components/schemas/Aluno_PeriodoLetivo"
+            curso:
+              $ref: "#/components/schemas/Aluno_Curso_Short"
+            curriculo:
+              $ref: "#/components/schemas/Aluno_Curriculo_Short"
+      example:
+        id: 18000012345
+        resourceType: Aluno
+        lastUpdated: 2023-02-13T12:00:00Z
+        matricula: 18000012345
+        nome: Ricardo Staciarini Puttini
+        ira: 4.89
+        periodoIngresso:
+          ano: 2018
+          periodo: 1
+        curso:
+          id: 6335
+          resourceType: Curso
+          lastUpdated: 2023-02-13T12:00:00Z
+          codigo: 6335
+          nome: Engenharia Elétrica
+        curriculo:
+          id: 6335.1
+          resourceType: Curriculo
+          lastUpdated: 2023-02-13T12:00:00Z
+          codigo: 6335.1
+          nome: Engenharia Elétrica
+
+    Aluno_Short:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            matricula:
+              type: string
+            nome:
+              type: string
+      id: 18000012345
+      resourceType: Aluno
+      lastUpdated: 2023-02-13T12:00:00Z
+      matricula: 18000012345
+      nome: Ricardo Staciarini Puttini
+
+    Aluno_PeriodoLetivo:
+      type: object
+      properties:
+        ano:
+          type: integer
+        periodo:
+          type: integer
+      example:
+        ano: 2018
+        periodo: 1
+
+    Aluno_Curso_Short:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - propertiess:
+          codigo:
+            type: string
+          nome:
+            type: string
+      example:
+        id: 6335
+        resourceType: Curso
+        lastUpdated: 2023-02-13T12:00:00Z
+        codigo: 6335
+        nome: Engenharia Elétrica
+
+    Aluno_Curriculo_Short:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            codigo:
+              type: string
+            nome:
+              type: string
+      id: 6335.1
+      resourceType: Curriculo
+      lastUpdated: 2023-02-13T12:00:00Z
+      codigo: 6335.1
+      nome: Engenharia Elétrica
