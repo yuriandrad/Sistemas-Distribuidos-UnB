@@ -1,0 +1,225 @@
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+# yaml-language-server: $ref=https://spec.openapis.org/oas/3.1/schema/2025-02-13.json
+
+openapi: 3.0.4
+info:
+  title: SIGAA 2.0
+  description: |-
+    API SIGAA
+  termsOfService: http://redes.unb.br/api/sigaa/terms/
+  contact:
+    email: ricardo.puttini@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://unb.br/api/sigaa
+tags:
+  - name: Curso
+    description: Cursos da UnB
+paths:
+  /Curso:
+    get:
+      tags:
+        - Curso
+      summary: Pesquisa curso
+      description: Pesquisa cursos da UnB
+      operationId: searchCurso
+      parameters:
+        - name: codigo
+          in: query
+          description: Código do curso.
+          required: false
+          schema:
+            type: string
+        - name: nome
+          in: query
+          description: Nome ou parte do nome do curso.
+          required: false
+          schema:
+            type: string
+        - name: sede
+          in: query
+          description: Sede do curso.
+          required: false
+          schema:
+            type: string
+        - name: _count
+          in: query
+          description: Número de registro retornados por página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: _offset
+          in: query
+          description: Índice do primeiro registro da página atual
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Curso_SearchSet"
+        "404":
+          description: Curso não encontrado!
+  /Curso/{id}:
+    get:
+      tags:
+        - Curso
+      summary: Consulta um curso.
+      description: Consulta um curso da UnB pelo codigo (id).
+      operationId: readCurso
+      parameters:
+        - name: id
+          in: path
+          description: Codigo do curso.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Curso"
+        "404":
+          description: Curso não encontrado!
+components:
+  schemas:
+    Resource:
+      type: object
+      properties:
+        id:
+          type: string
+        resourceType:
+          type: string
+          enum:
+            - Aluno
+            - Curriculo
+            - Curso
+            - Disciplina
+            - HistoricoAcademico
+            - Matricula
+            - Turma
+        lastUpdated:
+          type: string
+          format: dateTime
+
+    SearchSet:
+      type: object
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        count:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        link:
+          type: object
+          properties:
+            self:
+              type: string
+            next:
+              type: string
+            previous:
+              type: string
+
+    Curso_Short:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            matricula:
+              type: string
+            nome:
+              type: string
+
+    Curso_SearchSet:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/SearchSet"
+        - properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Curso_Short"
+
+    Curso:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            codigo:
+              type: string
+            nome:
+              type: string
+            turno:
+              type: string
+              enum:
+                - Diurno
+                - Noturno
+            grau:
+              type: string
+              enum:
+                - Bacharelado
+                - Especialização
+                - Mestrado Acadêmico
+                - Mestrado Profissional
+                - Doutorado
+            modalidade:
+              type: string
+              enum:
+                - Presencial
+                - À distância
+            sede:
+              type: string
+            unidadeOrganizacional:
+              $ref: "#/components/schemas/Curso_UnidadeOrganizacional"
+            coordenador:
+              $ref: "#/components/schemas/Curso_Docente"
+
+      Curso_Short:
+        type: object
+        properties:
+          codigo:
+            type: string
+          nome:
+            type: string
+          sede:
+            type: string
+
+      Curso_SearchSet:
+        type: object
+        allOf:
+          - $ref: "#/components/schemas/SearchSet"
+          - properties:
+              items:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Curso_Short"
+
+    Curso_Docente:
+      type: object
+      properties:
+        matricula:
+          type: string
+        nome:
+          type: string
+
+    Curso_UnidadeOrganizacional:
+      type: object
+      properties:
+        codigo:
+          type: string
+        nome:
+          type: string
