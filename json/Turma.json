@@ -1,0 +1,23 @@
+{
+  "resourseType": "Turma",
+  "codigo": "CIC0201-01",
+  "vagasOfertadas": 40,
+  "vagasPreenchidas": 35,
+  "status": "Aberta",
+  "horario": {
+    "dia": "Segunda-feira",
+    "inicio": "Manha",
+    "fim": "Tarde"
+  },
+  "periodoLetivo": {
+    "ano": 2025,
+    "periodo": 1
+  },
+  "disciplina": {
+    "id": "CIC0201",
+    "resourceType": "Disciplina",
+    "lastUpdated": "2025-03-10T09:00:00Z",
+    "codigo": "CIC0201",
+    "nome": "Algoritmos e Estruturas de Dados"
+  }
+}

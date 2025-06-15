@@ -1,0 +1,62 @@
+{
+  "id": "18000012345",
+  "resourceType": "HistoricoAcademico",
+  "lastUpdated": "2024-12-01T10:00:00Z",
+  "aluno": {
+    "id": "18000012345",
+    "resourceType": "Aluno",
+    "lastUpdated": "2024-12-01T09:30:00Z",
+    "matricula": "18000012345",
+    "nome": "Ana Carolina Oliveira",
+    "ira": 4.21,
+    "periodoIngresso": {
+      "ano": 2021,
+      "periodo": 2
+    },
+    "curso": {
+      "codigo": "1130",
+      "nome": "Engenharia de Software",
+      "sede": "FGA"
+    },
+    "curriculo": {
+      "id": "1130.1",
+      "resourceType": "Curriculo",
+      "lastUpdated": "2024-01-10T08:00:00Z",
+      "codigo": "1130.1",
+      "status": "Ativo",
+      "curso": {
+        "codigo": "1130",
+        "nome": "Engenharia de Software",
+        "sede": "FGA"
+      },
+      "periodoLetivoVigor": {
+        "ano": 2021,
+        "periodo": 2
+      }
+    }
+  },
+  "disciplina": {
+    "mencao": "MS",
+    "frequencia": 95.5,
+    "status": "Concluída",
+    "disciplina": {
+      "id": "ESW0001",
+      "resourceType": "Disciplina",
+      "lastUpdated": "2023-03-01T10:00:00Z",
+      "codigo": "ESW0001",
+      "nome": "Introdução à Engenharia de Software"
+    }
+  },
+  "cargaHorariaIntegralizada": 1080,
+  "cargaHorariaPendente": 960,
+  "status": "Em andamento",
+  "componentesPendentes": {
+    "id": "EST0002",
+    "resourceType": "Disciplina",
+    "lastUpdated": "2023-02-01T08:00:00Z",
+    "codigo": "EST0002",
+    "nome": "Estatística Aplicada",
+    "tipo": "Obrigatória",
+    "nivel": 3
+  }
+}

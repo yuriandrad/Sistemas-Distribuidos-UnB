@@ -1,0 +1,35 @@
+{
+  "id": "ADM0023",
+  "resourceType": "Disciplina",
+  "lastUpdated": "2023-03-01T14:00:00Z",
+  "codigo": "ADM0023",
+  "nome": "Introdução à Administração",
+  "modalidade": "Presencial",
+  "cargaHoraria": [
+    {
+      "cargaHorariaPresencial": {
+        "teorica": 30,
+        "pratica": 15,
+        "extensionista": 0
+      },
+      "cargaHorariaEad": {
+        "teorica": 0,
+        "pratica": 0,
+        "extensionista": 0
+      }
+    }
+  ],
+  "unidadeOrganizacional": {
+    "codigo": "11.01.01.02.01",
+    "nome": "DEPTO ADMINISTRAÇÃO - BRASÍLIA"
+  },
+  "preRequisito": [
+    {
+      "id": "ADM0001",
+      "resourceType": "Disciplina",
+      "lastUpdated": "2022-12-01T10:00:00Z",
+      "codigo": "ADM0001",
+      "nome": "Fundamentos de Gestão"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "6335",
+  "resourceType": "Curso",
+  "lastUpdated": "2023-01-10T10:30:00Z",
+  "codigo": "6335",
+  "nome": "Engenharia Elétrica",
+  "turno": "Diurno",
+  "grau": "Bacharelado",
+  "modalidade": "Presencial",
+  "sede": "Asa Norte",
+  "unidadeOrganizacional": {
+    "codigo": "11.01.01.02.01",
+    "nome": "FACULDADE DE TECNOLOGIA"
+  },
+  "coordenador": {
+    "matricula": "999999999",
+    "nome": "Prof. João da Silva"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "id": "8117/1",
+  "resourceType": "Curriculo",
+  "lastUpdated": "2022-08-09T15:30:00.000Z",
+  "codigo": "8117/1",
+  "status": "Ativo",
+  "dataValidade": "Indefinido",
+  "curso": {
+    "codigo": "8117",
+    "nome": "Administracao",
+    "turno": "Matutino",
+    "grau": "Bacharelado",
+    "modalidade": "Presencial",
+    "sede": "Asa Norte",
+    "unidadeOrganizacional": {
+      "codigo": "11.01.01.02.01",
+      "nome": "DEPTO ADMINISTRAÇÃO - BRASÍLIA"
+    }
+  },
+  "periodoLetivoVigor": {
+    "ano": 2020,
+    "periodo": 1
+  },
+  "cargaHoraria": {
+    "totalMinima": 3000,
+    "obrigatoriaAula": 1680,
+    "obrigatoriaOrientacao": 0,
+    "obrigatoriaTotal": 1680,
+    "optativaMinima": 1320,
+    "maximaEletivos": 360,
+    "maximaPeriodo": 420,
+    "minimaPeriodo": 210
+  },
+  "prazo": {
+    "minimo": 8,
+    "medio": 8,
+    "maximo": 16
+  },
+  "disciplina": {
+    "tipo": "Obrigatória",
+    "nivel": 1
+  }
+}
