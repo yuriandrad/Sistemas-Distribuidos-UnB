@@ -1,0 +1,259 @@
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+# yaml-language-server: $ref=https://spec.openapis.org/oas/3.1/schema/2025-02-13.json
+
+openapi: 3.0.4
+info:
+  title: SIGAA 2.0
+  description: |-
+    API SIGAA
+  termsOfService: http://redes.unb.br/api/sigaa/terms/
+  contact:
+    email: ricardo.puttini@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://unb.br/api/sigaa
+tags:
+  - name: Turma
+    description: Turmas dos cursos da UnB
+paths:
+  /Turma:
+    get:
+      tags:
+        - Turma
+      summary: Consulta turma
+      description: Consulta uma turma pelo seu código.
+      operationId: searchTurma
+      parameters:
+        - name: codigo
+          in: query
+          description: codigo da turma
+          required: false
+          schema:
+            type: string
+        - name: periodoLetivo
+          in: query
+          description: Período letivo da turma.
+          required: false
+          schema:
+            type: string
+        - name: disciplina
+          in: query
+          description: Nome da disciplina.
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Status da turma.
+          required: false
+          schema:
+            type: string
+        - name: horario
+          in: query
+          description: Horário da turma.
+          required: false
+          schema:
+            type: string
+        - name: _count
+          in: query
+          description: Número de registro retornados por página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: _offset
+          in: query
+          description: Índice do primeiro registro da página atual
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Turma_SearchSet"
+  /Turma/{id}:
+    get:
+      tags:
+        - Turma
+      summary: Consulta uma turma.
+      description: Consulta uma turma pelo seu código (id).
+      operationId: readTurma
+      parameters:
+        - name: id
+          in: path
+          description: Código da turma
+          required: true
+          schema:
+            type: string
+        - name: disciplina
+          in: query
+          description: Disciplinas da turma
+          required: true
+          schema:
+            type: string
+        - name: periodoLetivo
+          in: query
+          description: Período letivo da turma.
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Status da turma.
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Turma"
+        "404":
+          description: Disciplina não encontrado!
+
+components:
+  schemas:
+    Resource:
+      type: object
+      properties:
+        id:
+          type: string
+        resourceType:
+          type: string
+          enum:
+            - Aluno
+            - Curriculo
+            - Curso
+            - Disciplina
+            - HistoricoAcademico
+            - Matricula
+            - Turma
+        lastUpdated:
+          type: string
+          format: dateTime
+
+    SearchSet:
+      type: object
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        count:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        link:
+          type: object
+          properties:
+            self:
+              type: string
+            next:
+              type: string
+            previous:
+              type: string
+
+    Turma_Curso_Short:
+      type: object
+      properties:
+        codigo:
+          type: string
+        nome:
+          type: string
+        sede:
+          type: string
+
+    Turma_Disciplina_Short:
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            codigo:
+              type: string
+            nome:
+              type: string
+
+    Turma_PeriodoLetivo:
+      type: object
+      properties:
+        ano:
+          type: integer
+        periodo:
+          type: integer
+
+    Turma:
+      type: object
+      properties:
+        resourseType:
+          type: string
+          enum:
+            - Turma
+        codigo:
+          type: string
+        vagasOfertadas:
+          type: integer
+        vagasPreenchidas:
+          type: integer
+        status:
+          type: string
+        horario:
+          $ref: "#/components/schemas/Turma_Horario"
+        periodoLetivo:
+          $ref: "#/components/schemas/Turma_PeriodoLetivo"
+        disciplina:
+          $ref: "#/components/schemas/Turma_Disciplina_Short"
+
+    Turma_Short:
+      type: object
+      properties:
+        codigo:
+          $ref: "#/components/schemas/Turma"
+        horario:
+          $ref: "#/components/schemas/Turma_Horario"
+        curriculo:
+          $ref: "#/components/schemas/Turma_Curso_Short"
+    Turma_SearchSet:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/SearchSet"
+        - properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Turma_Short"
+
+    Turma_Horario:
+      type: object
+      properties:
+        dia:
+          type: string
+          enum:
+            - Segunda-feira
+            - Terca-feira
+            - Quarta-feira
+            - Quinta-feira
+            - Sexta-feira
+        inicio:
+          type: string
+          enum:
+            - Manha
+            - Tarde
+            - Noite
+        fim:
+          type: string
+          enum:
+            - Manha
+            - Tarde
+            - Noite
