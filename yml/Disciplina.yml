@@ -1,0 +1,217 @@
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+# yaml-language-server: $ref=https://spec.openapis.org/oas/3.1/schema/2025-02-13.json
+
+openapi: 3.0.4
+info:
+  title: SIGAA 2.0
+  description: |-
+    API SIGAA
+  termsOfService: http://redes.unb.br/api/sigaa/terms/
+  contact:
+    email: ricardo.puttini@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://unb.br/api/sigaa
+tags:
+  - name: Disciplina
+    description: Disciplinas dos cursos da UnB
+paths:
+  /Disciplina:
+    get:
+      tags:
+        - Disciplina
+      summary: Pesquisa disciplinas
+      description: Pesquisa disciplinas da UnB
+      operationId: searchDisciplina
+      parameters:
+        - name: codigo
+          in: query
+          description: Código da disciplina.
+          required: true
+          schema:
+            type: string
+        - name: nome
+          in: query
+          description: Nome ou parte do nome da disciplina. (Disciplina.nome)
+          required: true
+          schema:
+            type: string
+        - name: modalidade
+          in: query
+          description: Modalidade da disciplina.
+          required: false
+          schema:
+            $ref: "#/components/schemas/Disciplina_Modalidade"
+        - name: unidadeOrganizacional
+          in: query
+          schema:
+            $ref: "#/components/schemas/Disciplina_UnidadeOrganizacional"
+        - name: _count
+          in: query
+          description: Número de registro retornados por página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: _offset
+          in: query
+          description: Índice do primeiro registro da página atual
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Disciplina_SearchSet"
+        "404":
+          description: Disciplina não encontrada!
+  /Disciplina/{id}:
+    get:
+      tags:
+        - Disciplina
+      summary: Consultar disciplina.
+      description: Consulta uma disciplina pelo seu código (id).
+      operationId: readDisciplina
+      parameters:
+        - name: id
+          in: path
+          description: Código da disciplina.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Disciplina"
+        "404":
+          description: Disciplina não encontrado!
+components:
+  schemas:
+    Resource:
+      type: object
+      properties:
+        id:
+          type: string
+        resourceType:
+          type: string
+          enum:
+            - Aluno
+            - Curriculo
+            - Curso
+            - Disciplina
+            - HistoricoAcademico
+            - Matricula
+            - Turma
+        lastUpdated:
+          type: string
+          format: dateTime
+
+    SearchSet:
+      type: object
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        count:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        link:
+          type: object
+          properties:
+            self:
+              type: string
+            next:
+              type: string
+            previous:
+              type: string
+
+    Disciplina:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - properties:
+            codigo:
+              type: string
+            nome:
+              type: string
+            modalidade:
+              $ref: "#/components/schemas/Disciplina_Modalidade"
+            cargaHoraria:
+              type: array
+              items:
+                $ref: "#/components/schemas/Disciplina_CargaHoraria"
+            unidadeOrganizacional:
+              $ref: "#/components/schemas/Disciplina_UnidadeOrganizacional"
+            preRequisito:
+              type: array
+              items:
+                $ref: "#/components/schemas/Disciplina_Short"
+
+    Disciplina_Short:
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            codigo:
+              type: string
+            nome:
+              type: string
+
+    Disciplina_SearchSet:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/SearchSet"
+        - properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Disciplina_Short"
+
+    Disciplina_CargaHoraria:
+      type: object
+      properties:
+        cargaHorariaPresencial:
+          type: object
+          properties:
+            teorica:
+              type: integer
+            pratica:
+              type: integer
+            extensionista:
+              type: integer
+        cargaHorariaEad:
+          type: object
+          properties:
+            teorica:
+              type: integer
+            pratica:
+              type: integer
+            extensionista:
+              type: integer
+
+    Disciplina_Modalidade:
+      type: string
+      enum:
+        - Presencial
+        - À distância
+
+    Disciplina_UnidadeOrganizacional:
+      type: object
+      properties:
+        codigo:
+          type: string
+        nome:
+          type: string
