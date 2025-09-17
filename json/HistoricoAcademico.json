@@ -6,8 +6,6 @@
     "id": "18000012345",
     "resourceType": "Aluno",
     "lastUpdated": "2024-12-01T09:30:00Z",
-    "matricula": "18000012345",
-    "nome": "Ana Carolina Oliveira",
     "ira": 4.21,
     "periodoIngresso": {
       "ano": 2021,
