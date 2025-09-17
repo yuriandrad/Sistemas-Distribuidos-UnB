@@ -1,13 +1,4 @@
-{
-  "id": "18000012345",
-  "resourceType": "Aluno",
-  "lastUpdated": "2023-02-13T12:00:00Z",
-  "matricula": "18000012345",
-  "nome": "Ricardo Staciarini Puttini",
-  "ira": 4.89,
-  "periodoIngresso": {
-    "ano": 2018,
-    "periodo": 1
+
   },
   "curso": {
     "id": "6335",
